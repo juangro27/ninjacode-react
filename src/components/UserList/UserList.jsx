@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import usersService from "../../services/users.service";
 import Spinner from "../Spinner/Spinner";
 import Modal from "../Modal/Modal";
+import UserInformation from "./UserInformation/UserInformation";
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
@@ -14,7 +15,8 @@ const UserList = () => {
         getUsers();
     }, []);
 
-    const showUserInformation = () => {
+    const showUserInformation = (index) => {
+        setUserSelected(users[index]);
         setShowModal(true);
     };
 
@@ -25,18 +27,26 @@ const UserList = () => {
 
             setUsers(users);
             setLoading(false);
-            console.log(users);
         } catch (err) {
             console.log(err);
         }
     };
     return (
         <>
-            {showModal && (
+            {showModal && userSelected && (
                 <Modal
                     showModal={showModal}
                     setShowModal={setShowModal}
-                ></Modal>
+                    title="User information"
+                    avatar={
+                        <img
+                            className=" rounded-full text-red-600"
+                            src={userSelected.picture.large}
+                            alt={`${userSelected.name.first} ${userSelected.name.last} `}
+                        />
+                    }
+                    content={<UserInformation user={userSelected} />}
+                />
             )}
             {loading ? (
                 <Spinner />
@@ -85,13 +95,16 @@ const UserList = () => {
                                     </thead>
                                     <tbody className="divide-y divide-gray-200">
                                         {users.map(
-                                            ({
-                                                id,
-                                                name,
-                                                location,
-                                                email,
-                                                phone,
-                                            }) => {
+                                            (
+                                                {
+                                                    id,
+                                                    name,
+                                                    location,
+                                                    email,
+                                                    phone,
+                                                },
+                                                index
+                                            ) => {
                                                 return (
                                                     <tr
                                                         key={
@@ -113,10 +126,12 @@ const UserList = () => {
                                                         </td>
                                                         <td className="px-6 py-4 text-sm   font-medium text-center whitespace-nowrap ">
                                                             <p
-                                                                onClick={
-                                                                    showUserInformation
+                                                                onClick={() =>
+                                                                    showUserInformation(
+                                                                        index
+                                                                    )
                                                                 }
-                                                                className="text-white bg-sky-700 hover:bg-sky-800 focus:ring-4 focus:ring-sky-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-sky-600 dark:hover:bg-sky-700 focus:outline-none dark:focus:ring-sky-800"
+                                                                className="cursor-pointer	 text-white bg-sky-700 hover:bg-sky-800 focus:ring-4 focus:ring-sky-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-sky-600 dark:hover:bg-sky-700 focus:outline-none dark:focus:ring-sky-800"
                                                             >
                                                                 More details
                                                             </p>
